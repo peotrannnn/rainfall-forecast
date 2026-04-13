@@ -1,8 +1,15 @@
+# Data
 Data/
 *.csv
 *.zip
-*.pkl
 *.parquet
+*.pkl
 
+# CatBoost logs
+catboost_info/
+
+# Jupyter
 .ipynb_checkpoints/
+
+# Python cache
 __pycache__/
