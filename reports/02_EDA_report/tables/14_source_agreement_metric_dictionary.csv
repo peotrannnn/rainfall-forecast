@@ -1,0 +1,11 @@
+metric,formula,interpretation,processing_use
+bias_mm,mean(NASA_POWER_precipitation_mm - Open_Meteo_precipitation_mm),Signed source offset. Positive means NASA POWER is wetter on average.,Detects whether city/month bias correction is needed before averaging.
+mae_mm,mean(abs(NASA_POWER_precipitation_mm - Open_Meteo_precipitation_mm)),Typical daily magnitude gap between the two sources.,Large MAE means a simple mean can hide substantial uncertainty.
+rmse_mm,sqrt(mean((NASA_POWER_precipitation_mm - Open_Meteo_precipitation_mm)^2)),Error metric that penalizes large disagreement events more than MAE.,Highlights extreme source conflicts that may need flags or robust targets.
+smape_pct,mean(2 * abs(NASA - Open_Meteo) / (abs(NASA) + abs(Open_Meteo) + epsilon)) * 100,Scale-normalized percentage disagreement.,Useful because a 5 mm gap is more serious on dry days than on very wet days.
+pearson_corr,"corr(NASA_POWER_precipitation_mm, Open_Meteo_precipitation_mm)",Linear co-movement between daily rainfall amounts.,"High correlation supports shared signal, but does not prove equal magnitude."
+spearman_corr,"corr(rank(NASA_POWER_precipitation_mm), rank(Open_Meteo_precipitation_mm))",Rank-order agreement between the two sources.,Checks whether both sources rank dry/wet days similarly even when magnitudes differ.
+wet_day_agreement_pct,mean((NASA >= 1 mm) == (Open_Meteo >= 1 mm)) * 100,How often both sources agree on wet versus non-wet days.,Important if the next task predicts rain occurrence or class labels.
+wet_day_cohen_kappa,(observed wet-day agreement - expected chance agreement) / (1 - expected chance agreement),Chance-corrected agreement for wet-day classification.,More rigorous than raw agreement when wet days are common or rare.
+wet_day_jaccard,wet-day intersection / wet-day union,Overlap between the sets of wet days detected by the two sources.,Useful for rainfall event detection and wet-spell features.
+mean_abs_diff_relative_to_mean,mae_mm / mean((NASA_POWER_precipitation_mm + Open_Meteo_precipitation_mm) / 2),Source disagreement relative to the city rainfall scale.,Prevents wet cities from looking worse only because their rainfall is larger.

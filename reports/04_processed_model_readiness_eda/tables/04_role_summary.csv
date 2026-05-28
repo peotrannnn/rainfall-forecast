@@ -1,0 +1,8 @@
+role,column_count
+strict_forecast_predictor,15
+metadata_or_review,12
+imputation_flag,9
+quality_metadata_not_predictor,8
+weather_assisted_predictor,6
+identifier,5
+target_candidate,5

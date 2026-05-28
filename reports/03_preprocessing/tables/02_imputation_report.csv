@@ -1,0 +1,10 @@
+column_name,missing_before,missing_after,imputation_applied,global_train_median_fallback,formula,reason
+rainfall_lag_1d_mm,12,0,True,3.47,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.
+rainfall_lag_7d_mm,84,0,True,3.475,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.
+rainfall_lag_30d_mm,360,0,True,3.52,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.
+rainfall_rolling_7d_mean_prev_mm,36,0,True,5.582857142857144,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.
+rainfall_rolling_30d_sum_prev_mm,120,0,True,193.89,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.
+rainfall_rolling_90d_mean_prev_mm,360,0,True,7.0199444444444445,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.
+wet_spell_days_prev,12,0,True,4.0,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.
+dry_spell_days_prev,12,0,True,0.0,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.
+was_wet_previous_day,12,0,True,1.0,"if missing, fill with median_train(column | entity_id); fallback median_train(column)",Structural warm-up missingness from lag/rolling/spell feature construction.

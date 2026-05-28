@@ -1,0 +1,9 @@
+check,value,expected,passed
+processed_rows,26304,26304,True
+processed_columns,60,"slim schema, fewer than 70 columns",True
+processed_entities,12,12,True
+processed_missing_cells,0,0,True
+negative_target_candidate_rows,0,0,True
+train_rows,17532,17532,True
+validation_rows,4392,4392,True
+test_rows,4380,4380,True

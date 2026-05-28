@@ -1,0 +1,6 @@
+target_column,target_group,note
+target_nasa_power_precipitation_mm,rainfall_target_candidate,Stored in y only; never included in X.
+target_open_meteo_precipitation_mm,rainfall_target_candidate,Stored in y only; never included in X.
+target_baseline_two_source_mean_mm,rainfall_target_candidate,Stored in y only; never included in X.
+target_nasa_reference_consensus_mm,rainfall_target_candidate,Stored in y only; never included in X.
+target_open_meteo_reference_consensus_mm,rainfall_target_candidate,Stored in y only; never included in X.

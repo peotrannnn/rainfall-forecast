@@ -1,0 +1,4 @@
+output_dataset,predictors,targets,exclude,why
+strict_forecast,location + calendar + lag/rolling/spell features + imputation flags,all target candidates,same-day weather and source-uncertainty fields,lowest leakage risk
+weather_assisted_forecast,strict_forecast predictors + weather summary features,all target candidates,source-uncertainty fields as predictors,use only if weather variables are available at prediction time
+uncertainty_metadata,none,none,not applicable,"use source uncertainty as weights, flags, or evaluation slices"

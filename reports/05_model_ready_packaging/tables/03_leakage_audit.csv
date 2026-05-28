@@ -1,0 +1,15 @@
+check,passed,detail
+feature_columns_have_feature_prefix,True,Every predictor column is explicitly prefixed with feature_.
+no_target_columns_in_X,True,"Target columns are stored only in y, never in X."
+no_source_uncertainty_columns_in_X,True,Same-day source-disagreement metadata is excluded from X.
+no_same_day_weather_columns_in_X,True,Same-day weather summary columns are excluded from strict-forecast X.
+rainfall_lag_1d_uses_previous_day_only,True,Non-imputed lag-1 rainfall equals previous-day baseline rainfall within each entity.
+rainfall_lag_7d_uses_previous_7th_day_only,True,Non-imputed lag-7 rainfall equals the value seven days earlier within each entity.
+rainfall_lag_30d_uses_previous_30th_day_only,True,Non-imputed lag-30 rainfall equals the value thirty days earlier within each entity.
+rolling_7d_mean_uses_prior_days_only,True,Rolling 7-day mean is computed from prior rainfall values only.
+rolling_30d_sum_uses_prior_days_only,True,Rolling 30-day sum is computed from prior rainfall values only.
+rolling_90d_mean_uses_prior_days_only,True,Rolling 90-day mean is computed from prior rainfall values only.
+X_has_no_missing_values,True,X missing cells: 0.
+y_has_no_missing_values,True,y missing cells: 0.
+sample_id_unique,True,sample_id is unique in X and y.
+X_y_alignment,True,X and y rows are aligned by sample_id.

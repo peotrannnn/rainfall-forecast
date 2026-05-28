@@ -1,0 +1,125 @@
+{
+  "column_counts": {
+    "X_columns_total": 30,
+    "X_feature_columns": 24,
+    "target_columns": 5,
+    "y_columns_total": 11
+  },
+  "created_at_utc": "2026-05-28T07:30:45+00:00",
+  "created_by_notebook": "notebooks/05_model_ready_packaging.ipynb",
+  "dataset_name": "Leakage-free strict forecast model-ready rainfall package",
+  "files": [
+    {
+      "path": "data\\processed\\model_ready\\sea_rainfall_daily_2020_2025_model_ready_strict_forecast_X.csv",
+      "sha256": "5a15c701a5ac3b81f7490fa310eccec64058534215596a8abdad4f8761be0be2"
+    },
+    {
+      "path": "data\\processed\\model_ready\\sea_rainfall_daily_2020_2025_model_ready_targets_y.csv",
+      "sha256": "23ce82cda3fedb851b3a0fb063d90505b328f5de84db4087c20c735b6391095f"
+    },
+    {
+      "path": "reports\\05_model_ready_packaging\\tables\\01_strict_forecast_feature_schema.csv",
+      "sha256": "1637b78517fab54bb640b6fb94234c836fe4021621d3311bad938b451fb91234"
+    },
+    {
+      "path": "reports\\05_model_ready_packaging\\tables\\02_target_schema.csv",
+      "sha256": "0d37786e8eae807b4e192bfdc261ff0c78695e2c9ff7e8d75aff1be5b095be1c"
+    },
+    {
+      "path": "reports\\05_model_ready_packaging\\tables\\03_leakage_audit.csv",
+      "sha256": "b7e1b1446279650ed60b10c0e2184583efb67a00c466c589debf3dd235ac0ea7"
+    },
+    {
+      "path": "reports\\05_model_ready_packaging\\tables\\04_rejected_columns_not_in_X.csv",
+      "sha256": "4262acb0d86c14cb273db007eea10a0f76dbca734384fb2bf0e3e54a8ca8430c"
+    },
+    {
+      "path": "reports\\05_model_ready_packaging\\MODEL_READY_PACKAGE_SUMMARY.md",
+      "sha256": "d5f6d6d12f82f75fd3ed923929a8d09e23263b544da5b46372bd25877097f8fc"
+    }
+  ],
+  "input_file": "data\\processed\\sea_rainfall_daily_2020_2025_processed_features.csv",
+  "leakage_audit": [
+    {
+      "check": "feature_columns_have_feature_prefix",
+      "detail": "Every predictor column is explicitly prefixed with feature_.",
+      "passed": true
+    },
+    {
+      "check": "no_target_columns_in_X",
+      "detail": "Target columns are stored only in y, never in X.",
+      "passed": true
+    },
+    {
+      "check": "no_source_uncertainty_columns_in_X",
+      "detail": "Same-day source-disagreement metadata is excluded from X.",
+      "passed": true
+    },
+    {
+      "check": "no_same_day_weather_columns_in_X",
+      "detail": "Same-day weather summary columns are excluded from strict-forecast X.",
+      "passed": true
+    },
+    {
+      "check": "rainfall_lag_1d_uses_previous_day_only",
+      "detail": "Non-imputed lag-1 rainfall equals previous-day baseline rainfall within each entity.",
+      "passed": true
+    },
+    {
+      "check": "rainfall_lag_7d_uses_previous_7th_day_only",
+      "detail": "Non-imputed lag-7 rainfall equals the value seven days earlier within each entity.",
+      "passed": true
+    },
+    {
+      "check": "rainfall_lag_30d_uses_previous_30th_day_only",
+      "detail": "Non-imputed lag-30 rainfall equals the value thirty days earlier within each entity.",
+      "passed": true
+    },
+    {
+      "check": "rolling_7d_mean_uses_prior_days_only",
+      "detail": "Rolling 7-day mean is computed from prior rainfall values only.",
+      "passed": true
+    },
+    {
+      "check": "rolling_30d_sum_uses_prior_days_only",
+      "detail": "Rolling 30-day sum is computed from prior rainfall values only.",
+      "passed": true
+    },
+    {
+      "check": "rolling_90d_mean_uses_prior_days_only",
+      "detail": "Rolling 90-day mean is computed from prior rainfall values only.",
+      "passed": true
+    },
+    {
+      "check": "X_has_no_missing_values",
+      "detail": "X missing cells: 0.",
+      "passed": true
+    },
+    {
+      "check": "y_has_no_missing_values",
+      "detail": "y missing cells: 0.",
+      "passed": true
+    },
+    {
+      "check": "sample_id_unique",
+      "detail": "sample_id is unique in X and y.",
+      "passed": true
+    },
+    {
+      "check": "X_y_alignment",
+      "detail": "X and y rows are aligned by sample_id.",
+      "passed": true
+    }
+  ],
+  "output_files": {
+    "X": "data\\processed\\model_ready\\sea_rainfall_daily_2020_2025_model_ready_strict_forecast_X.csv",
+    "y": "data\\processed\\model_ready\\sea_rainfall_daily_2020_2025_model_ready_targets_y.csv"
+  },
+  "row_counts": {
+    "X_rows": 26304,
+    "test_rows": 4380,
+    "train_rows": 17532,
+    "validation_rows": 4392,
+    "y_rows": 26304
+  }
+}

@@ -1,0 +1,9 @@
+check,value,expected,passed
+resolved_entity_date_duplicate_rows,0,0,True
+source_entity_date_duplicate_rows,0,0,True
+resolved_rows,26304,26304,True
+source_observation_rows,52608,52608,True
+entities,12,12,True
+negative_nasa_precipitation_rows,0,0,True
+negative_open_meteo_precipitation_rows,0,0,True
+negative_two_source_mean_rows,0,0,True

@@ -1,0 +1,61 @@
+column_name,dtype,feature_group,modeling_role,meaning
+entity_id,object,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+date,datetime64[ns],identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+split,object,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+country,object,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+location_name,object,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+canonical_latitude,float64,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+canonical_longitude,float64,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+year,int32,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+month,int32,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+month_name,object,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+day_of_year,int32,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+is_leap_year,int64,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+season_quarter,object,identifier_or_time,metadata,"Identifier, location descriptor, coordinate, temporal split, or calendar field."
+target_nasa_power_precipitation_mm,float64,target_candidate,target_candidate,Rainfall target candidate. Use sensitivity analysis before selecting a final target.
+target_open_meteo_precipitation_mm,float64,target_candidate,target_candidate,Rainfall target candidate. Use sensitivity analysis before selecting a final target.
+target_baseline_two_source_mean_mm,float64,target_candidate,target_candidate,Rainfall target candidate. Use sensitivity analysis before selecting a final target.
+target_nasa_reference_consensus_mm,float64,target_candidate,target_candidate,Rainfall target candidate. Use sensitivity analysis before selecting a final target.
+target_open_meteo_reference_consensus_mm,float64,target_candidate,target_candidate,Rainfall target candidate. Use sensitivity analysis before selecting a final target.
+target_reference_consensus_band_mm,float64,target_uncertainty,quality_or_weight_feature,"Feature describing disagreement, calibration uncertainty, or target confidence."
+source_bias_nasa_minus_open_meteo_mm,float64,target_uncertainty,quality_or_weight_feature,"Feature describing disagreement, calibration uncertainty, or target confidence."
+source_abs_diff_precipitation_mm,float64,target_uncertainty,quality_or_weight_feature,"Feature describing disagreement, calibration uncertainty, or target confidence."
+source_relative_abs_diff_precipitation,float64,target_uncertainty,quality_or_weight_feature,"Feature describing disagreement, calibration uncertainty, or target confidence."
+source_bias_train_city_month_mm,float64,target_uncertainty,quality_or_weight_feature,"Feature describing disagreement, calibration uncertainty, or target confidence."
+wet_day_disagreement,int64,target_uncertainty,quality_or_weight_feature,"Feature describing disagreement, calibration uncertainty, or target confidence."
+high_source_gap_10mm,int64,target_uncertainty,quality_or_weight_feature,"Feature describing disagreement, calibration uncertainty, or target confidence."
+high_source_gap_20mm,int64,target_uncertainty,quality_or_weight_feature,"Feature describing disagreement, calibration uncertainty, or target confidence."
+month_sin,float64,calendar_encoding,predictor,Cyclic calendar encoding for seasonality.
+month_cos,float64,calendar_encoding,predictor,Cyclic calendar encoding for seasonality.
+day_of_year_sin,float64,calendar_encoding,predictor,Cyclic calendar encoding for seasonality.
+day_of_year_cos,float64,calendar_encoding,predictor,Cyclic calendar encoding for seasonality.
+temp_mean_c_mean_two_sources,float64,weather_summary,predictor,Two-source mean meteorological predictor.
+temp_max_c_mean_two_sources,float64,weather_summary,predictor,Two-source mean meteorological predictor.
+temp_min_c_mean_two_sources,float64,weather_summary,predictor,Two-source mean meteorological predictor.
+relative_humidity_pct_mean_two_sources,float64,weather_summary,predictor,Two-source mean meteorological predictor.
+wind_speed_ms_mean_two_sources,float64,weather_summary,predictor,Two-source mean meteorological predictor.
+surface_pressure_kpa_mean_two_sources,float64,weather_summary,predictor,Two-source mean meteorological predictor.
+temp_mean_c_source_abs_diff,float64,weather_source_uncertainty,predictor,Absolute gap between NASA POWER and Open-Meteo for a weather predictor.
+temp_max_c_source_abs_diff,float64,weather_source_uncertainty,predictor,Absolute gap between NASA POWER and Open-Meteo for a weather predictor.
+temp_min_c_source_abs_diff,float64,weather_source_uncertainty,predictor,Absolute gap between NASA POWER and Open-Meteo for a weather predictor.
+relative_humidity_pct_source_abs_diff,float64,weather_source_uncertainty,predictor,Absolute gap between NASA POWER and Open-Meteo for a weather predictor.
+wind_speed_ms_source_abs_diff,float64,weather_source_uncertainty,predictor,Absolute gap between NASA POWER and Open-Meteo for a weather predictor.
+surface_pressure_kpa_source_abs_diff,float64,weather_source_uncertainty,predictor,Absolute gap between NASA POWER and Open-Meteo for a weather predictor.
+rainfall_lag_1d_mm,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+rainfall_lag_7d_mm,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+rainfall_lag_30d_mm,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+rainfall_rolling_7d_mean_prev_mm,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+rainfall_rolling_30d_sum_prev_mm,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+rainfall_rolling_90d_mean_prev_mm,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+wet_spell_days_prev,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+dry_spell_days_prev,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+was_wet_previous_day,float64,forecasting_history_feature,predictor,Lagged or rolling rainfall feature computed using previous days only.
+rainfall_lag_1d_mm_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.
+rainfall_lag_7d_mm_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.
+rainfall_lag_30d_mm_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.
+rainfall_rolling_7d_mean_prev_mm_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.
+rainfall_rolling_30d_sum_prev_mm_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.
+rainfall_rolling_90d_mean_prev_mm_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.
+wet_spell_days_prev_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.
+dry_spell_days_prev_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.
+was_wet_previous_day_was_imputed,int64,imputation_indicator,predictor_quality_flag,Binary indicator equal to 1 when the corresponding engineered history feature was imputed.

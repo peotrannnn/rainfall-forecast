@@ -1,0 +1,2 @@
+scope,valid_pairs,bias_mm,mae_mm,rmse_mm,smape_pct,pearson_corr,spearman_corr,wet_day_agreement_pct,wet_day_cohen_kappa,wet_day_jaccard,mean_daily_rainfall_mm,mean_abs_diff_relative_to_mean,high_gap_10mm_ratio,high_gap_20mm_ratio
+all_cities_all_days,26304.0,-0.26004447992700735,5.882847095498784,12.379083441000953,95.1856340388469,0.41973577059967454,0.6947792802761431,80.58470194647201,0.5842173289528428,0.732505761575529,6.786340290450121,0.8668659163629596,0.1791742700729927,0.061625608272506086

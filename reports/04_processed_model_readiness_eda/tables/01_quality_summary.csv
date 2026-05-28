@@ -1,0 +1,6 @@
+check,value,expected,passed
+rows,26304,26304,True
+columns,60,compact schema,True
+entities,12,12,True
+missing_cells,0,0,True
+negative_target_rows,0,0,True

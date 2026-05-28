@@ -1,0 +1,124 @@
+{
+  "canonical_entities": 12,
+  "collection_finished_at_utc": "2026-05-28T06:16:24+00:00",
+  "collection_started_at_utc": "2026-05-28T06:14:36+00:00",
+  "created_by_notebook": "notebooks/01_data_collection.ipynb",
+  "dataset_name": "Multi-source Southeast Asia daily rainfall dataset 2020-2025",
+  "date_range": {
+    "end": "2025-12-31",
+    "frequency": "daily",
+    "start": "2020-01-01"
+  },
+  "entity_resolution": {
+    "canonical_key": "entity_id",
+    "merge_key": [
+      "entity_id",
+      "date"
+    ],
+    "method": "nearest canonical coordinate within 50 km for each source-returned coordinate",
+    "purpose": "Map NASA POWER and Open-Meteo records describing the same city/location to one canonical entity."
+  },
+  "files": [
+    {
+      "path": "data\\raw\\sea_rainfall_daily_2020_2025_raw_api_responses.jsonl",
+      "sha256": "262865df639437658a2130298981177683aa5190b2d4a3029894c37958117dbb"
+    },
+    {
+      "path": "data\\raw\\sea_rainfall_daily_2020_2025_source_observations.csv",
+      "sha256": "71abb067d41e87fcaec9af55b8e649f973bb4aee2634a3d6a932c7825c6d3d64"
+    },
+    {
+      "path": "data\\raw\\sea_rainfall_daily_2020_2025_entity_resolved.csv",
+      "sha256": "99aa1227345611ec2469420eeaeaf6b3af7d878e21e117f5de90468fc0897ffb"
+    },
+    {
+      "path": "data\\raw\\sea_rainfall_daily_2020_2025_entity_registry.csv",
+      "sha256": "0817bddc01d3d438b473e975332b8d516f0601ce68b52bb008c1da3d86560028"
+    }
+  ],
+  "quality_summary": {
+    "actual_rows_by_source": {
+      "NASA_POWER_DAILY": 26304,
+      "OPEN_METEO_ARCHIVE": 26304
+    },
+    "expected_daily_dates": 2192,
+    "expected_rows_per_source": 26304,
+    "negative_precipitation_rows": 0,
+    "resolved_duplicate_rows": 0,
+    "resolved_top_missing_rate": {
+      "canonical_latitude": 0.0,
+      "canonical_longitude": 0.0,
+      "country": 0.0,
+      "date": 0.0,
+      "entity_id": 0.0,
+      "location_name": 0.0,
+      "nasa_power_precipitation_mm": 0.0,
+      "nasa_power_relative_humidity_pct": 0.0,
+      "nasa_power_surface_pressure_kpa": 0.0,
+      "nasa_power_temp_max_c": 0.0,
+      "nasa_power_temp_mean_c": 0.0,
+      "nasa_power_temp_min_c": 0.0,
+      "nasa_power_wind_speed_ms": 0.0,
+      "open_meteo_precipitation_mm": 0.0,
+      "open_meteo_relative_humidity_pct": 0.0,
+      "open_meteo_surface_pressure_kpa": 0.0,
+      "open_meteo_temp_max_c": 0.0,
+      "open_meteo_temp_mean_c": 0.0,
+      "open_meteo_temp_min_c": 0.0,
+      "open_meteo_wind_speed_ms": 0.0
+    },
+    "source_duplicate_rows": 0,
+    "source_missing_rate": [
+      {
+        "precipitation_mm": 0.0,
+        "relative_humidity_pct": 0.0,
+        "source": "NASA_POWER_DAILY",
+        "surface_pressure_kpa": 0.0,
+        "temp_max_c": 0.0,
+        "temp_mean_c": 0.0,
+        "temp_min_c": 0.0,
+        "wind_speed_ms": 0.0
+      },
+      {
+        "precipitation_mm": 0.0,
+        "relative_humidity_pct": 0.0,
+        "source": "OPEN_METEO_ARCHIVE",
+        "surface_pressure_kpa": 0.0,
+        "temp_max_c": 0.0,
+        "temp_mean_c": 0.0,
+        "temp_min_c": 0.0,
+        "wind_speed_ms": 0.0
+      }
+    ]
+  },
+  "row_counts": {
+    "entity_registry_rows": 12,
+    "entity_resolved_rows": 26304,
+    "raw_api_requests": 24,
+    "source_observations": 52608
+  },
+  "secret_policy": "No API key or token is required, read, printed, or stored.",
+  "sources": [
+    {
+      "base_url": "https://power.larc.nasa.gov/api/temporal/daily/point",
+      "documentation": "https://power.larc.nasa.gov/docs/services/api/temporal/daily/",
+      "name": "NASA POWER Daily API",
+      "requires_api_key": false
+    },
+    {
+      "base_url": "https://archive-api.open-meteo.com/v1/archive",
+      "documentation": "https://open-meteo.com/en/docs/historical-weather-api",
+      "name": "Open-Meteo Historical Weather API",
+      "requires_api_key": false
+    }
+  ],
+  "standard_variables": [
+    "precipitation_mm",
+    "temp_mean_c",
+    "temp_max_c",
+    "temp_min_c",
+    "relative_humidity_pct",
+    "wind_speed_ms",
+    "surface_pressure_kpa"
+  ]
+}

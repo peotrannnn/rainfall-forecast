@@ -1,0 +1,44 @@
+column_name,observed_dtype_before_engineering,feature_group,unit_or_format,source_or_lineage,meaning
+entity_id,object,Identifier,None,Canonical,Canonical real-world location after entity resolution.
+date,datetime64[ns],Time key,YYYY-MM-DD,Canonical,Daily observation date.
+country,object,Descriptor,None,Canonical,Country of the canonical location.
+location_name,object,Descriptor,None,Canonical,City or capital name.
+canonical_latitude,float64,Coordinate,Decimal degrees,Canonical,Latitude used to define the canonical entity.
+canonical_longitude,float64,Coordinate,Decimal degrees,Canonical,Longitude used to define the canonical entity.
+nasa_power_precipitation_mm,float64,Weather,mm/day,NASA POWER,NASA POWER corrected daily precipitation.
+nasa_power_temp_mean_c,float64,Weather,C,NASA POWER,NASA POWER daily mean air temperature at 2 meters.
+nasa_power_temp_max_c,float64,Weather,C,NASA POWER,NASA POWER daily maximum air temperature at 2 meters.
+nasa_power_temp_min_c,float64,Weather,C,NASA POWER,NASA POWER daily minimum air temperature at 2 meters.
+nasa_power_relative_humidity_pct,float64,Weather,Percent,NASA POWER,NASA POWER relative humidity at 2 meters.
+nasa_power_wind_speed_ms,float64,Weather,m/s,NASA POWER,NASA POWER wind speed at 2 meters.
+nasa_power_surface_pressure_kpa,float64,Weather,kPa,NASA POWER,NASA POWER surface pressure.
+open_meteo_precipitation_mm,float64,Weather,mm/day,Open-Meteo,Open-Meteo daily precipitation sum.
+open_meteo_temp_mean_c,float64,Weather,C,Open-Meteo,Open-Meteo daily mean air temperature at 2 meters.
+open_meteo_temp_max_c,float64,Weather,C,Open-Meteo,Open-Meteo daily maximum air temperature at 2 meters.
+open_meteo_temp_min_c,float64,Weather,C,Open-Meteo,Open-Meteo daily minimum air temperature at 2 meters.
+open_meteo_relative_humidity_pct,float64,Weather,Percent,Open-Meteo,Open-Meteo daily mean relative humidity at 2 meters.
+open_meteo_wind_speed_ms,float64,Weather,m/s,Open-Meteo standardized,Open-Meteo wind speed converted from km/h to m/s.
+open_meteo_surface_pressure_kpa,float64,Weather,kPa,Open-Meteo standardized,Open-Meteo pressure converted from hPa to kPa.
+precipitation_mm_mean_two_sources,float64,Derived,mm/day,Notebook 01,Mean of NASA POWER and Open-Meteo precipitation for the same entity-date.
+precipitation_mm_abs_diff,float64,Derived quality metric,mm/day,Notebook 01,Absolute precipitation gap between NASA POWER and Open-Meteo.
+rainfall_mm,created in this notebook,Engineered rainfall target,mm/day,Notebook 02,Alias of the two-source mean precipitation used as the main EDA rainfall measure.
+source_bias_mm,created in this notebook,Source uncertainty,mm/day,Notebook 02,NASA POWER precipitation minus Open-Meteo precipitation.
+source_abs_diff_mm,created in this notebook,Source uncertainty,mm/day,Notebook 02,Absolute daily difference between the two rainfall sources.
+source_relative_abs_diff,created in this notebook,Source uncertainty,Ratio,Notebook 02,Absolute source gap divided by rainfall amount plus one to control scale effects.
+wet_day,created in this notebook,Rainfall regime,Boolean,Notebook 02,Day with rainfall at least 1 mm.
+moderate_rain_day,created in this notebook,Rainfall regime,Boolean,Notebook 02,Day with rainfall at least 10 mm.
+heavy_rain_day,created in this notebook,Rainfall regime,Boolean,Notebook 02,Day with rainfall at least 20 mm.
+extreme_rain_day,created in this notebook,Rainfall regime,Boolean,Notebook 02,Day with rainfall at least 50 mm.
+rainfall_lag_1d,created in this notebook,Temporal feature,mm/day,Notebook 02,Previous day rainfall within the same entity.
+rainfall_lag_7d,created in this notebook,Temporal feature,mm/day,Notebook 02,Rainfall seven days earlier within the same entity.
+rainfall_rolling_7d_mean,created in this notebook,Temporal feature,mm/day,Notebook 02,Seven-day rolling mean rainfall within the same entity.
+rainfall_rolling_30d_sum,created in this notebook,Temporal feature,mm/30 days,Notebook 02,Thirty-day rolling rainfall accumulation within the same entity.
+rainfall_rolling_90d_mean,created in this notebook,Temporal feature,mm/day,Notebook 02,Ninety-day rolling mean rainfall within the same entity.
+rainfall_anomaly_mm,created in this notebook,Climatology feature,mm/day,Notebook 02,Daily rainfall minus entity-month climatological daily rainfall.
+rainfall_zscore_city_month,created in this notebook,Climatology feature,Standard deviations,Notebook 02,City-month standardized daily rainfall anomaly.
+rainfall_percentile_city,created in this notebook,Distribution feature,0-1 percentile,Notebook 02,Within-city percentile rank of daily rainfall.
+wet_spell_days,created in this notebook,Spell feature,Days,Notebook 02,Current consecutive wet-day run length.
+dry_spell_days,created in this notebook,Spell feature,Days,Notebook 02,Current consecutive dry-day run length.
+month_sin,created in this notebook,Seasonality encoding,Unitless,Notebook 02,Sine encoding of month for cyclic seasonality.
+month_cos,created in this notebook,Seasonality encoding,Unitless,Notebook 02,Cosine encoding of month for cyclic seasonality.
+season_quarter,created in this notebook,Seasonality feature,Category,Notebook 02,"DJF, MAM, JJA, or SON seasonal label."

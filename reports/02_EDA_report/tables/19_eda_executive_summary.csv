@@ -1,0 +1,8 @@
+topic,result,implication
+Coverage,"26,304 entity-date rows across 12 canonical locations from 2020-01-01 to 2025-12-31.",The dataset is wide enough for city-level daily rainfall preprocessing and temporal validation.
+Data quality,8/8 core quality checks passed; negative rainfall and duplicate key counts are zero.,The next notebook can focus on modeling-oriented preprocessing rather than basic data repair.
+Rainfall burden,Singapore is the wettest city by six-year total (24812 mm); Bangkok is the driest (9681 mm).,Train/test splitting and scaling should be city-aware because rainfall regimes are not homogeneous.
+Rainfall persistence,Singapore has the highest wet-day ratio (91.9%).,Wet/dry spell features and lag features should be retained for forecasting tasks.
+Global source agreement,"NASA POWER vs Open-Meteo global MAE=5.88 mm/day, RMSE=12.38 mm/day, Pearson=0.42, wet-day kappa=0.58.",The two APIs share signal but still disagree enough that the target needs uncertainty-aware treatment.
+Worst source disagreement,Singapore has the largest source MAE (10.46 mm/day).,Cities with high disagreement need source-specific diagnostics or external validation before final target construction.
+Averaging decision,0/12 cities pass the strict direct-averaging rule; 11/12 are flagged as do-not-blindly-average.,Do not use the simple arithmetic mean as the final universal target without bias correction or sensitivity checks.

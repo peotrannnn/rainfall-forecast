@@ -1,0 +1,6 @@
+target_candidate,mean,median,std
+target_nasa_power_precipitation_mm,6.656318050486617,2.47,12.195529182848006
+target_open_meteo_precipitation_mm,6.916362530413626,2.7,10.655334673291332
+target_baseline_two_source_mean_mm,6.786340290450121,3.5,9.635277252705094
+target_nasa_reference_consensus_mm,6.792203241234298,3.718024193548387,9.6406358617442
+target_open_meteo_reference_consensus_mm,7.021059761588065,3.6990900537634404,9.642803956815913

@@ -1,0 +1,7 @@
+finding_type,finding
+rainfall_burden,Singapore has the highest six-year rainfall total (24812 mm).
+rainfall_persistence,Singapore has the highest wet-day ratio (91.9%).
+dry_reference,Bangkok has the lowest six-year rainfall total (9681 mm).
+source_uncertainty,Singapore has the largest mean daily NASA/Open-Meteo absolute difference (10.46 mm/day).
+methodological_implication,The resolved dataset should retain source-specific rainfall columns and source-gap features; collapsing to one target without auditing disagreement can hide uncertainty.
+feature_engineering_implication,"Lag, rolling, anomaly, spell-length, and cyclic month features are justified because rainfall varies by persistence, intensity, city, and season."

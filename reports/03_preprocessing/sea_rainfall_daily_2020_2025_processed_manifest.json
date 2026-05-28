@@ -1,0 +1,146 @@
+{
+  "bias_correction_formula": {
+    "city_month_bias": "mean_train(nasa_power_precipitation_mm - open_meteo_precipitation_mm | entity_id, month)",
+    "nasa_power_calibrated_to_open_meteo": "max(nasa_power_precipitation_mm - city_month_bias, 0)",
+    "open_meteo_calibrated_to_nasa": "max(open_meteo_precipitation_mm + city_month_bias, 0)"
+  },
+  "created_at_utc": "2026-05-28T06:59:15+00:00",
+  "created_by_notebook": "notebooks/03_preprocessing.ipynb",
+  "data_output_policy": {
+    "excluded_columns_documented_at": "reports\\03_preprocessing\\tables\\07_excluded_columns_from_slim_dataset.csv",
+    "processed_data_files": 1,
+    "reason": "Keep data/processed compact. Split labels are stored inside the main processed table.",
+    "slim_schema_columns": 60
+  },
+  "dataset_name": "Processed Southeast Asia daily rainfall dataset 2020-2025",
+  "files": [
+    {
+      "path": "data\\processed\\sea_rainfall_daily_2020_2025_processed_features.csv",
+      "role": "processed_data",
+      "sha256": "8eebd9157328675fc5af0e2140a1738ce8f8426e270d044c7a1bee80b3506dec"
+    },
+    {
+      "path": "reports\\03_preprocessing\\tables\\01_city_month_bias_correction.csv",
+      "role": "preprocessing_report",
+      "sha256": "3b22ac6a9f46371aa22e3c30abf5c4c3eff95ce228fd1e020988ac9a32bc7cb9"
+    },
+    {
+      "path": "reports\\03_preprocessing\\tables\\02_imputation_report.csv",
+      "role": "preprocessing_report",
+      "sha256": "7b90913b19b8e45e24c4f7d623c68e2a20bf6a3d4acb6cf6de74061427c449ef"
+    },
+    {
+      "path": "reports\\03_preprocessing\\tables\\03_scaling_parameters.csv",
+      "role": "preprocessing_report",
+      "sha256": "0f7a390f018773003adf252559479d16896023581e3f830a199e14d9e69a428a"
+    },
+    {
+      "path": "reports\\03_preprocessing\\tables\\04_processed_feature_dictionary.csv",
+      "role": "preprocessing_report",
+      "sha256": "9e21dcb4bf2383499ce6689e055201c3c5814596488b785d4531d22aef20b394"
+    },
+    {
+      "path": "reports\\03_preprocessing\\tables\\05_processed_quality_report.csv",
+      "role": "preprocessing_report",
+      "sha256": "2b0cb695b935f00ca1ba06a73f3898ad136655944720c3d1d12dc20348be0e5f"
+    },
+    {
+      "path": "reports\\03_preprocessing\\tables\\06_temporal_split_summary.csv",
+      "role": "preprocessing_report",
+      "sha256": "55a6b3f6b35b014542fa2cc7bd64941c1cb470b07f9cd41d0de49913a85e1d83"
+    },
+    {
+      "path": "reports\\03_preprocessing\\tables\\07_excluded_columns_from_slim_dataset.csv",
+      "role": "preprocessing_report",
+      "sha256": "3835e4fda8741a081a51d44b9c10fc73ad74936da28ac93b7ea2db0f439449e9"
+    },
+    {
+      "path": "reports\\03_preprocessing\\PREPROCESSING_README.md",
+      "role": "preprocessing_report",
+      "sha256": "0b92e82d95b4f8e5412dadb7e4f8ca06b4480ab8c206cab8bdc64ffa238ab910"
+    }
+  ],
+  "imputation_policy": {
+    "engineered_history_features_imputed": true,
+    "formula": "if missing, fill with median_train(feature | entity_id); fallback median_train(feature)",
+    "raw_source_measurements_imputed": false,
+    "raw_targets_imputed": false
+  },
+  "input_files": [
+    "data\\raw\\sea_rainfall_daily_2020_2025_entity_resolved.csv",
+    "data\\raw\\sea_rainfall_daily_2020_2025_entity_registry.csv"
+  ],
+  "quality_report": [
+    {
+      "check": "processed_rows",
+      "expected": 26304,
+      "passed": true,
+      "value": 26304
+    },
+    {
+      "check": "processed_columns",
+      "expected": "slim schema, fewer than 70 columns",
+      "passed": true,
+      "value": 60
+    },
+    {
+      "check": "processed_entities",
+      "expected": 12,
+      "passed": true,
+      "value": 12
+    },
+    {
+      "check": "processed_missing_cells",
+      "expected": 0,
+      "passed": true,
+      "value": 0
+    },
+    {
+      "check": "negative_target_candidate_rows",
+      "expected": 0,
+      "passed": true,
+      "value": 0
+    },
+    {
+      "check": "train_rows",
+      "expected": 17532,
+      "passed": true,
+      "value": 17532
+    },
+    {
+      "check": "validation_rows",
+      "expected": 4392,
+      "passed": true,
+      "value": 4392
+    },
+    {
+      "check": "test_rows",
+      "expected": 4380,
+      "passed": true,
+      "value": 4380
+    }
+  ],
+  "report_output_directory": "reports\\03_preprocessing",
+  "row_counts": {
+    "full": 26304,
+    "test": 4380,
+    "train": 17532,
+    "validation": 4392
+  },
+  "target_strategy": {
+    "decision": "Do not blindly average sources as the final target.",
+    "reason": "Notebook 02 found global MAE 5.88 mm/day, RMSE 12.38 mm/day, Pearson 0.42, and strict direct averaging supported for 0/12 cities.",
+    "target_candidates": [
+      "target_nasa_power_precipitation_mm",
+      "target_open_meteo_precipitation_mm",
+      "target_baseline_two_source_mean_mm",
+      "target_nasa_reference_consensus_mm",
+      "target_open_meteo_reference_consensus_mm"
+    ]
+  },
+  "temporal_split": {
+    "test": "2025-01-01 to 2025-12-31",
+    "train": "2020-01-01 to 2023-12-31",
+    "validation": "2024-01-01 to 2024-12-31"
+  }
+}
