@@ -1,6 +1,6 @@
-# Rainfall Web App
+# Rainfall Forecast Series Web App
 
-Local web app for interactive rainfall prediction with the three models trained in notebook 07.
+Local web app for interactive Southeast Asia rainfall prediction.
 
 ## Run
 
@@ -22,11 +22,52 @@ Then open:
 http://127.0.0.1:8007/
 ```
 
-The app loads:
+## What The App Does
 
-- `models/07_model_training/*_pipeline.joblib`
-- `data/processed/model_ready/sea_rainfall_daily_2020_2025_model_ready_strict_forecast_X.csv`
-- `data/processed/model_ready/sea_rainfall_daily_2020_2025_model_ready_targets_y.csv`
-- `data/groundtruth/sea_station_rainfall_daily_2020_2025_entity_groundtruth.csv`
+1. Select one city.
+2. Select one trained model from notebook 07.
+3. The backend fetches the latest observed rainfall history from web APIs.
+4. The backend rebuilds the same lag, rolling, wet-spell, dry-spell, location, and calendar features used during training.
+5. The selected model predicts rainfall for the next 14 days after today.
+6. The frontend plots the full predicted rainfall series, Open-Meteo web forecast, NASA historical baseline, rainfall-intensity bands, volatility metrics, and highest-risk days.
 
-Predictions are converted from `log1p(rainfall_mm)` back to millimeters with `expm1`, then clipped to `[0, 500]` mm/day, matching notebook 07.
+## Web Input Sources
+
+The model is still your trained ML model. NASA POWER is used to provide the recent historical rainfall inputs needed by the model.
+
+- NASA POWER Daily API: `PRECTOTCORR`.
+- Local packaged NASA target data: final fallback for dates already inside the project dataset.
+- NASA 2020-2025 day-of-year climatology: final NASA-only fallback when recent NASA NRT days are not yet available.
+
+## NASA Context And Comparison
+
+The dashboard also fetches recent daily context from NASA POWER:
+
+- latest available NASA daily temperature
+- latest available NASA daily rainfall
+- latest available NASA daily humidity
+- latest available NASA daily wind speed
+
+NASA POWER does not provide the same kind of operational future weather forecast as a weather provider. Therefore, the chart keeps NASA as a seasonal baseline and adds a separate Open-Meteo web forecast line as an external reference.
+
+## Three Forecast Lines
+
+- ML forecast: the selected trained model.
+- Web forecast: Open-Meteo Forecast API, used only as an external reference line.
+- NASA seasonal baseline: NASA POWER 2020-2025 day-of-year average, used as a historical seasonal reference.
+
+The web forecast and NASA baseline are not used as model input features.
+
+## Leakage Rule
+
+The app does not feed same-day target values, station ground truth, or alternative target columns into the model. It uses prior-day rainfall history only to rebuild model features.
+
+Multi-day future forecasting needs future lag inputs. Day 1 uses observed web history only. Day 2 onward uses earlier ML predictions as rainfall-memory inputs because those future prior days have not happened yet. If the observed history needed for Day 1 is incomplete, the affected prediction rows are marked unavailable.
+
+## Rainfall Classes
+
+- Rain unlikely: below 1 mm/day.
+- Light rain: 1 to below 10 mm/day.
+- Moderate rain: 10 to below 25 mm/day.
+- Heavy rain: 25 to below 50 mm/day.
+- Extreme rain: 50 mm/day or more.
