@@ -1,0 +1,3 @@
+source,rows,cities,date_min,date_max,precip_mean_mm_day,precip_min_mm_day,precip_max_mm_day
+NASA_POWER_DAILY,26304,12,2020-01-01,2025-12-31,6.656318050486618,0.0,274.47
+OPEN_METEO_ARCHIVE,26304,12,2020-01-01,2025-12-31,6.916362530413625,0.0,196.9

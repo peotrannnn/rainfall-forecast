@@ -1,0 +1,6 @@
+check,passed,details
+selected_target_not_in_features,True,target_nasa_power_precipitation_mm
+no_same_day_source_or_target_columns_in_features,True,none
+date_not_used_as_raw_predictor,True,seasonality is represented by sine/cosine features created earlier
+test_split_not_used_for_hyperparameter_selection,True,trial selection uses validation MAE only; test metrics are reported after selection
+groundtruth_not_used_as_predictor,True,NOAA station ground truth was used in notebook 06 only to select the target

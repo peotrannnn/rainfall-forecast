@@ -1,0 +1,48 @@
+{
+  "collection_finished_at_utc": "2026-05-30T05:01:14+00:00",
+  "created_by_notebook": "notebooks/06_target_selection_eda_for_model_training.ipynb",
+  "dataset_name": "Southeast Asia station rainfall ground truth from NOAA GHCN-Daily 2020-2025",
+  "date_range": {
+    "end": "2025-12-31",
+    "frequency": "daily",
+    "start": "2020-01-01"
+  },
+  "files": [
+    {
+      "path": "data\\groundtruth\\sea_station_rainfall_daily_2020_2025_station_observations.csv",
+      "sha256": "9f8a369cf89aabdd7cf8cb2264546d865eabea92895c4ffbabb25ed7e3c90bf0"
+    },
+    {
+      "path": "data\\groundtruth\\sea_station_rainfall_daily_2020_2025_entity_groundtruth.csv",
+      "sha256": "9dd1cd3bd2964ebecb20073a799360d4177d5d6e98102c56f0acbab3396cbaf1"
+    },
+    {
+      "path": "data\\groundtruth\\sea_station_rainfall_daily_2020_2025_station_registry.csv",
+      "sha256": "a5d2f7c0d456d8da7e6ebf0804e5d44764ce5fca82c201934526765cc9c6e919"
+    }
+  ],
+  "row_counts": {
+    "entity_groundtruth_rows": 26304,
+    "paired_train_validation_rows": 11840,
+    "selected_station_rows": 15,
+    "station_candidates": 24,
+    "station_observation_rows": 32880
+  },
+  "source": {
+    "base_url": "https://www.ncei.noaa.gov/pub/data/ghcn/daily",
+    "inventory_url": "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-inventory.txt",
+    "name": "NOAA GHCN-Daily",
+    "precipitation_element": "PRCP",
+    "requires_api_key": false,
+    "stations_url": "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt",
+    "unit_conversion": "station_precipitation_mm = PRCP / 10"
+  },
+  "station_selection": {
+    "aggregation_method": "inverse distance weighted daily precipitation over selected stations",
+    "fallback_radius_km": 300,
+    "max_candidate_stations_per_entity": 10,
+    "max_selected_stations_per_entity": 3,
+    "minimum_station_coverage": 0.6,
+    "primary_radius_km": 100
+  }
+}

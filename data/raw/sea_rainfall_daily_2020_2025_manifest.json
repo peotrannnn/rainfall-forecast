@@ -1,7 +1,7 @@
 {
   "canonical_entities": 12,
-  "collection_finished_at_utc": "2026-05-28T06:16:24+00:00",
-  "collection_started_at_utc": "2026-05-28T06:14:36+00:00",
+  "collection_finished_at_utc": "2026-05-30T04:28:39+00:00",
+  "collection_started_at_utc": "2026-05-30T04:26:24+00:00",
   "created_by_notebook": "notebooks/01_data_collection.ipynb",
   "dataset_name": "Multi-source Southeast Asia daily rainfall dataset 2020-2025",
   "date_range": {
@@ -21,7 +21,7 @@
   "files": [
     {
       "path": "data\\raw\\sea_rainfall_daily_2020_2025_raw_api_responses.jsonl",
-      "sha256": "262865df639437658a2130298981177683aa5190b2d4a3029894c37958117dbb"
+      "sha256": "ee75b9c59ec631ace8156ee9e59f846dc06d31a5411e5ff4ec4ce3bf600b7e45"
     },
     {
       "path": "data\\raw\\sea_rainfall_daily_2020_2025_source_observations.csv",

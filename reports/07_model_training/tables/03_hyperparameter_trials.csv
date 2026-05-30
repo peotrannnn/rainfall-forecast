@@ -1,0 +1,9 @@
+model_name,trial_id,params,elapsed_seconds,validation_mae_mm_day,validation_rmse_mm_day
+hist_gradient_boosting_log,hist_gradient_boosting_log_trial_01,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 15, ""l2_regularization"": 0.0}",2.298,4.372699592962052,10.583315588176765
+hist_gradient_boosting_log,hist_gradient_boosting_log_trial_02,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 31, ""l2_regularization"": 0.1}",0.639,4.38612874967519,10.575959381666996
+hist_gradient_boosting_log,hist_gradient_boosting_log_trial_03,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 31, ""l2_regularization"": 0.1}",0.866,4.387002254964636,10.583180688038674
+gradient_boosting_log,gradient_boosting_log_trial_01,"{""learning_rate"": 0.05, ""max_depth"": 2, ""subsample"": 0.9}",5.92,4.396202446657911,10.596125117937655
+gradient_boosting_log,gradient_boosting_log_trial_02,"{""learning_rate"": 0.03, ""max_depth"": 3, ""subsample"": 0.9}",11.407,4.385208961520974,10.58605443745188
+gradient_boosting_log,gradient_boosting_log_trial_03,"{""learning_rate"": 0.05, ""max_depth"": 3, ""subsample"": 0.8}",5.903,4.386401959586221,10.575716704462648
+mlp_log,mlp_log_trial_01,"{""hidden_layer_sizes"": [32], ""alpha"": 0.0001, ""learning_rate_init"": 0.001}",1.468,4.344769714822297,10.463654090436433
+mlp_log,mlp_log_trial_02,"{""hidden_layer_sizes"": [64, 32], ""alpha"": 0.0001, ""learning_rate_init"": 0.001}",1.741,4.378454203581464,10.49708277159178

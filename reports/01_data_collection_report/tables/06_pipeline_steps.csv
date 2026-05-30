@@ -1,0 +1,13 @@
+step,operation,output_or_effect
+1,Define canonical locations,Creates 12 stable city-level entity_id values.
+2,Build API URLs,Creates NASA POWER and Open-Meteo no-key daily archive requests.
+3,Fetch JSON payloads,Downloads 24 raw API responses.
+4,Parse source variables,Maps each source to the shared standard schema.
+5,Standardize units,Converts Open-Meteo wind speed and pressure units.
+6,Resolve entities,Maps source coordinates to nearest canonical entity within 50 km.
+7,Save raw responses,Writes raw JSONL audit file.
+8,Save source observations,Writes long-form source observations CSV.
+9,Build resolved table,Merges NASA and Open-Meteo by entity_id and date.
+10,Compute immediate source fields,Adds two-source precipitation mean and absolute difference.
+11,Run quality checks,"Checks duplicate rows, negative rainfall, missingness, and expected counts."
+12,Write manifest,"Writes metadata, hashes, source info, and quality summary."

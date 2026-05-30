@@ -1,0 +1,3 @@
+source_name,source_code,base_url,requires_api_key,request_count,rows,documentation
+NASA POWER Daily API,NASA_POWER_DAILY,https://power.larc.nasa.gov/api/temporal/daily/point,False,12,26304,https://power.larc.nasa.gov/docs/services/api/temporal/daily/
+Open-Meteo Historical Weather API,OPEN_METEO_ARCHIVE,https://archive-api.open-meteo.com/v1/archive,False,12,26304,https://open-meteo.com/en/docs/historical-weather-api

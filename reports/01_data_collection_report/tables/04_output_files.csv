@@ -1,0 +1,6 @@
+file_path,meaning,row_count_or_lines,primary_use
+data\raw\sea_rainfall_daily_2020_2025_raw_api_responses.jsonl,Raw JSON API responses and request URLs without secrets.,24,Reproducibility and audit trail.
+data\raw\sea_rainfall_daily_2020_2025_source_observations.csv,Long-form source observations before wide merge.,52608,Source-level quality checks and source agreement analysis.
+data\raw\sea_rainfall_daily_2020_2025_entity_resolved.csv,Wide entity-date table with NASA and Open-Meteo side by side.,26304,Main raw dataset for Notebook 02 and later preprocessing.
+data\raw\sea_rainfall_daily_2020_2025_entity_registry.csv,Canonical entity registry and source-coordinate matching metadata.,12,Entity resolution audit.
+data\raw\sea_rainfall_daily_2020_2025_manifest.json,"Manifest with metadata, row counts, hashes, and quality summary.",1,Dataset documentation and reproducibility.

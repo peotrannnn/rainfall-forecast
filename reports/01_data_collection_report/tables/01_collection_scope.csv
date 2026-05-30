@@ -1,0 +1,15 @@
+item,value
+notebook,notebooks/01_data_collection.ipynb
+dataset_name,Multi-source Southeast Asia daily rainfall dataset 2020-2025
+date_start,2020-01-01
+date_end,2025-12-31
+frequency,daily
+canonical_entities,12
+sources,2
+raw_api_requests,24
+source_observation_rows,52608
+rows_per_source,26304
+entity_resolved_rows,26304
+entity_registry_rows,12
+expected_daily_dates_per_city,2192
+secret_policy,"No API key or token is required, read, printed, or stored."

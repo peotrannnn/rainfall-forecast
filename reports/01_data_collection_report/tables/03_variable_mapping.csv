@@ -1,0 +1,8 @@
+standard_column,unit,nasa_power_parameter,open_meteo_variable,standardization_note
+precipitation_mm,mm/day,PRECTOTCORR,precipitation_sum,Daily precipitation amount.
+temp_mean_c,C,T2M,temperature_2m_mean,Already Celsius in both sources.
+temp_max_c,C,T2M_MAX,temperature_2m_max,Already Celsius in both sources.
+temp_min_c,C,T2M_MIN,temperature_2m_min,Already Celsius in both sources.
+relative_humidity_pct,percent,RH2M,relative_humidity_2m_mean,Daily mean relative humidity.
+wind_speed_ms,m/s,WS2M,wind_speed_10m_mean,Open-Meteo is converted from km/h to m/s by dividing by 3.6.
+surface_pressure_kpa,kPa,PS,surface_pressure_mean,Open-Meteo is converted from hPa to kPa by dividing by 10.

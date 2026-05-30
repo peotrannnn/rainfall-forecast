@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SEA Rainfall Model Console</title>
+    <link rel="stylesheet" href="static/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero-panel">
+        <div>
+          <p class="eyebrow">SEA rainfall forecast</p>
+          <h1>Rainfall Model Console</h1>
+        </div>
+        <div class="status-chip" id="statusChip">Connecting</div>
+      </section>
+
+      <section class="workspace-grid">
+        <section class="map-panel" aria-label="Southeast Asia city map">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Interactive map</p>
+              <h2 id="selectedCityTitle">Choose a city</h2>
+            </div>
+            <div class="mini-stat" id="cityCoverage">Ground truth coverage: --</div>
+          </div>
+          <div class="map-wrap">
+            <svg id="seaMap" viewBox="0 0 920 620" role="img" aria-label="Map of selected Southeast Asian rainfall locations">
+              <defs>
+                <linearGradient id="oceanGradient" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stop-color="#09233d"/>
+                  <stop offset="1" stop-color="#0c4c63"/>
+                </linearGradient>
+                <radialGradient id="shelfGlow" cx="55%" cy="48%" r="62%">
+                  <stop offset="0" stop-color="#4cc9d8" stop-opacity="0.26"/>
+                  <stop offset="1" stop-color="#4cc9d8" stop-opacity="0"/>
+                </radialGradient>
+                <pattern id="gridPattern" width="46" height="46" patternUnits="userSpaceOnUse">
+                  <path d="M 46 0 L 0 0 0 46" fill="none" stroke="#88cdf8" stroke-width="0.7" opacity="0.16"/>
+                </pattern>
+              </defs>
+              <rect width="920" height="620" fill="url(#oceanGradient)"/>
+              <rect width="920" height="620" fill="url(#gridPattern)"/>
+              <rect width="920" height="620" fill="url(#shelfGlow)"/>
+
+              <g class="map-labels" aria-hidden="true">
+                <text x="142" y="132">Myanmar</text>
+                <text x="278" y="170">Thailand</text>
+                <text x="388" y="220">Vietnam</text>
+                <text x="508" y="382">Borneo</text>
+                <text x="690" y="286">Philippines</text>
+                <text x="246" y="438">Sumatra</text>
+                <text x="456" y="532">Java Sea</text>
+              </g>
+
+              <g class="land-layer">
+                <path class="landmass" d="M 124.7 105.8 L 201.3 67.5 L 297.1 80.3 L 373.8 118.6 L 431.3 144.1 L 469.6 195.1 L 431.3 246.2 L 392.9 284.5 L 373.8 335.5 L 354.6 386.6 L 316.3 399.3 L 278.0 348.3 L 239.6 297.2 L 201.3 259.0 L 163.0 207.9 L 124.7 156.9 Z"/>
+                <path class="landmass" d="M 278.0 322.8 L 316.3 335.5 L 354.6 361.0 L 354.6 399.3 L 335.4 437.6 L 316.3 475.9 L 297.1 437.6 L 278.0 386.6 L 258.8 348.3 Z"/>
+                <path class="landmass" d="M 182.1 338.1 L 239.6 354.7 L 297.1 393.0 L 354.6 447.8 L 335.4 486.1 L 278.0 482.3 L 220.5 456.8 L 163.0 405.7 L 143.8 363.6 Z"/>
+                <path class="landmass" d="M 373.8 482.3 L 450.4 491.2 L 546.2 502.7 L 565.4 521.8 L 488.7 525.7 L 392.9 516.7 L 354.6 501.4 Z"/>
+                <path class="landmass" d="M 431.3 325.3 L 527.1 312.6 L 603.7 340.6 L 642.0 393.0 L 622.9 444.0 L 565.4 465.7 L 488.7 452.9 L 431.3 418.5 L 392.9 371.3 Z"/>
+                <path class="landmass" d="M 642.0 389.1 L 680.4 366.2 L 737.9 389.1 L 699.5 417.2 L 757.0 445.3 L 718.7 472.1 L 680.4 444.0 L 642.0 463.1 L 622.9 427.4 Z"/>
+                <path class="landmass island" d="M 661.2 172.2 L 699.5 179.8 L 718.7 214.3 L 699.5 246.2 L 670.8 230.9 L 649.7 202.8 Z"/>
+                <path class="landmass island" d="M 718.7 246.2 L 757.0 269.2 L 737.9 303.6 L 709.1 322.8 L 690.0 293.4 Z"/>
+                <path class="landmass island" d="M 833.7 424.9 L 872.0 444.0 L 872.0 514.2 L 795.3 520.6 L 757.0 488.7 L 776.2 437.6 Z"/>
+                <circle class="small-island" cx="601" cy="510" r="5"/>
+                <circle class="small-island" cx="636" cy="504" r="4"/>
+                <circle class="small-island" cx="674" cy="498" r="5"/>
+                <circle class="small-island" cx="746" cy="348" r="4"/>
+                <circle class="small-island" cx="775" cy="334" r="3"/>
+              </g>
+
+              <path class="equator-line" d="M 48 454 L 872 454"/>
+              <text class="equator-text" x="62" y="446">Equator</text>
+              <g id="cityMarkers"></g>
+            </svg>
+          </div>
+        </section>
+
+        <aside class="control-panel">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">Prediction input</p>
+              <h2>Forecast</h2>
+            </div>
+          </div>
+
+          <label class="field-label" for="citySelect">City</label>
+          <select id="citySelect"></select>
+
+          <label class="field-label" for="dateModeSelect">Prediction mode</label>
+          <select id="dateModeSelect">
+            <option value="forecast">Future forecast</option>
+            <option value="historical">Historical test / ground truth check</option>
+          </select>
+
+          <label class="field-label" for="dateInput">Date</label>
+          <input id="dateInput" type="date">
+          <p class="field-help" id="dateHelper">Loading date range.</p>
+
+          <label class="field-label" for="modelSelect">Model</label>
+          <select id="modelSelect"></select>
+
+          <button id="predictButton" type="button">Predict rainfall</button>
+
+          <section class="result-panel" aria-live="polite">
+            <p class="eyebrow">Prediction</p>
+            <div class="big-number" id="predictionValue">--</div>
+            <div class="result-grid">
+              <div>
+                <span>Ground truth</span>
+                <strong id="groundtruthValue">--</strong>
+              </div>
+              <div>
+                <span>Abs. error</span>
+                <strong id="errorValue">--</strong>
+              </div>
+              <div>
+                <span>Data split</span>
+                <strong id="splitValue">--</strong>
+              </div>
+              <div>
+                <span>Station distance</span>
+                <strong id="stationValue">--</strong>
+              </div>
+            </div>
+            <p class="note" id="resultNote">Select a city, date, and model.</p>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <script src="static/app.js"></script>
+  </body>
+</html>

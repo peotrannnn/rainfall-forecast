@@ -1,0 +1,5 @@
+decision_item,value,label,rationale
+primary_target,target_nasa_power_precipitation_mm,NASA POWER raw,Lowest train/validation MAE against independent GHCN-Daily station ground truth; tie-broken by RMSE and absolute bias.
+mae_mm_day,9.4207,,Computed on train/validation only.
+rmse_mm_day,17.6449,,Computed on train/validation only.
+bias_mm_day,-0.2196,,Positive means target is wetter than station reference.

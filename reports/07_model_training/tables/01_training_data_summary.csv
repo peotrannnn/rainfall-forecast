@@ -1,0 +1,12 @@
+item,value
+rows_total,26304
+columns_in_X_raw,30
+selected_target,target_nasa_power_precipitation_mm
+feature_count_used,25
+categorical_feature_count,1
+numeric_feature_count,24
+prediction_cap_mm_day,500.0
+wet_day_threshold_mm,1.0
+train_rows,17532
+validation_rows,4392
+test_rows,4380

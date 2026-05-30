@@ -1,0 +1,10 @@
+quality_check,result,value_or_note
+expected_daily_dates,pass,2192
+expected_rows_per_source,pass,26304
+NASA_POWER_DAILY_rows,pass,26304
+OPEN_METEO_ARCHIVE_rows,pass,26304
+source_duplicate_rows,pass,0
+resolved_duplicate_rows,pass,0
+negative_precipitation_rows,pass,0
+missing_standard_variables,pass,0 percent for both sources
+entity_resolution_threshold,pass,nearest canonical coordinate within 50 km for each source-returned coordinate
