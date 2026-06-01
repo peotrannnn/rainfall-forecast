@@ -1,12 +1,4 @@
-item,value
-rows_total,26304
-columns_in_X_raw,30
-selected_target,target_nasa_power_precipitation_mm
-feature_count_used,25
-categorical_feature_count,1
-numeric_feature_count,24
-prediction_cap_mm_day,500.0
-wet_day_threshold_mm,1.0
-train_rows,17532
-validation_rows,4392
-test_rows,4380
+split,rows,mean_mm_day,std_mm_day,max_mm_day,wet_day_ratio
+test,4380,7.401986301369863,14.321131024320396,259.03,0.6337899543378995
+train,17532,6.530662788044718,11.641883804569728,274.47,0.6255989048596852
+validation,4392,6.414278233151183,12.025110890997556,206.04,0.5922131147540983

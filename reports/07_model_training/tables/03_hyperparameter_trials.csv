@@ -1,9 +1,4 @@
-model_name,trial_id,params,elapsed_seconds,validation_mae_mm_day,validation_rmse_mm_day
-hist_gradient_boosting_log,hist_gradient_boosting_log_trial_01,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 15, ""l2_regularization"": 0.0}",2.298,4.372699592962052,10.583315588176765
-hist_gradient_boosting_log,hist_gradient_boosting_log_trial_02,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 31, ""l2_regularization"": 0.1}",0.639,4.38612874967519,10.575959381666996
-hist_gradient_boosting_log,hist_gradient_boosting_log_trial_03,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 31, ""l2_regularization"": 0.1}",0.866,4.387002254964636,10.583180688038674
-gradient_boosting_log,gradient_boosting_log_trial_01,"{""learning_rate"": 0.05, ""max_depth"": 2, ""subsample"": 0.9}",5.92,4.396202446657911,10.596125117937655
-gradient_boosting_log,gradient_boosting_log_trial_02,"{""learning_rate"": 0.03, ""max_depth"": 3, ""subsample"": 0.9}",11.407,4.385208961520974,10.58605443745188
-gradient_boosting_log,gradient_boosting_log_trial_03,"{""learning_rate"": 0.05, ""max_depth"": 3, ""subsample"": 0.8}",5.903,4.386401959586221,10.575716704462648
-mlp_log,mlp_log_trial_01,"{""hidden_layer_sizes"": [32], ""alpha"": 0.0001, ""learning_rate_init"": 0.001}",1.468,4.344769714822297,10.463654090436433
-mlp_log,mlp_log_trial_02,"{""hidden_layer_sizes"": [64, 32], ""alpha"": 0.0001, ""learning_rate_init"": 0.001}",1.741,4.378454203581464,10.49708277159178
+model_name,split,rows,mae_mm_day,rmse_mm_day,r2,wet_day_accuracy,target_mean_mm_day,prediction_mean_mm_day,target_std_mm_day,prediction_std_mm_day,std_capture_ratio,max_prediction_mm_day,trial_id
+hist_gradient_boosting_log,validation,4392,4.49984370698364,10.337593337468428,0.2608040104243641,0.8479052823315119,6.414278233151183,5.241790111963399,12.023741834137526,5.59589727625043,0.46540397768377645,60.935494670620685,hist_gradient_boosting_log_retrained_weighted
+gradient_boosting_log,validation,4392,4.476264450554736,10.24052667030675,0.27462046228423476,0.8538251366120219,6.414278233151183,5.334009184812544,12.023741834137526,5.856787127350796,0.4871018696294978,78.83960521470644,gradient_boosting_log_retrained_weighted
+mlp_log,validation,4392,4.539998405729846,10.234283017529128,0.27550472096336676,0.8494990892531876,6.414278233151183,5.574004501173233,12.023741834137526,6.280278112844357,0.5223231003690996,91.69873751519945,mlp_log_retrained_weighted
