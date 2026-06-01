@@ -531,12 +531,11 @@ async function loadCurrentWeather(entityId) {
       payload.wind_speed_10m_kmh === null
         ? "--"
         : `${Number(payload.wind_speed_10m_kmh).toFixed(1)} km/h`;
-    currentProviderToday.textContent = `${formatMm(
-      payload.today_provider_precipitation_sum_mm
-    )} / ${formatPctRaw(payload.today_provider_precipitation_probability_pct)}`;
+    currentProviderToday.textContent = payload.source || "--";
   } catch (error) {
     currentWeatherStatus.textContent = "Current weather unavailable";
-    currentCondition.textContent = error.message;
+    currentCondition.textContent = "Live provider unavailable";
+    currentProviderToday.textContent = "--";
   }
 }
 
@@ -809,11 +808,14 @@ function renderChart(rows) {
   const points = availableRows
     .map((row) => {
       const index = rows.indexOf(row);
+      const guardNote = row.prediction_was_capped
+        ? " - capped to 500 mm display limit"
+        : "";
       return `<circle class="chart-point category-${row.prediction_category.code}" cx="${xFor(
         index
       )}" cy="${yFor(row.prediction_mm)}" r="4"><title>${row.date}: ${formatMm(
         row.prediction_mm
-      )} - ${categoryLabel(row.prediction_category)}</title></circle>`;
+      )} - ${categoryLabel(row.prediction_category)}${guardNote}</title></circle>`;
     })
     .join("");
 

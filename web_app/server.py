@@ -106,6 +106,43 @@ def classify_rainfall(value) -> dict | None:
     return dict(RAINFALL_CATEGORIES[-1])
 
 
+def weather_code_label(weather_code) -> str:
+    labels = {
+        0: "Clear sky",
+        1: "Mainly clear",
+        2: "Partly cloudy",
+        3: "Overcast",
+        45: "Fog",
+        48: "Depositing rime fog",
+        51: "Light drizzle",
+        53: "Moderate drizzle",
+        55: "Dense drizzle",
+        56: "Light freezing drizzle",
+        57: "Dense freezing drizzle",
+        61: "Slight rain",
+        63: "Moderate rain",
+        65: "Heavy rain",
+        66: "Light freezing rain",
+        67: "Heavy freezing rain",
+        71: "Slight snow",
+        73: "Moderate snow",
+        75: "Heavy snow",
+        77: "Snow grains",
+        80: "Slight rain showers",
+        81: "Moderate rain showers",
+        82: "Violent rain showers",
+        85: "Slight snow showers",
+        86: "Heavy snow showers",
+        95: "Thunderstorm",
+        96: "Thunderstorm with slight hail",
+        99: "Thunderstorm with heavy hail",
+    }
+    numeric_code = to_json_value(weather_code)
+    if numeric_code is None:
+        return "--"
+    return labels.get(int(numeric_code), f"Weather code {int(numeric_code)}")
+
+
 def yyyymmdd(date_value) -> str:
     return pd.Timestamp(date_value).strftime("%Y%m%d")
 
@@ -120,10 +157,20 @@ def fetch_json(url: str, params: dict) -> dict:
         },
     )
     started = time.time()
-    with urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
+    # Some local Python sessions inherit broken proxy variables from the IDE
+    # environment. Weather APIs are public HTTPS endpoints, so bypass proxy
+    # settings here to avoid false "connection refused" live-weather failures.
+    opener = urllib_no_proxy_opener()
+    with opener.open(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
         payload = json.loads(response.read().decode("utf-8"))
     payload["_request_seconds"] = round(time.time() - started, 3)
     return payload
+
+
+def urllib_no_proxy_opener():
+    from urllib.request import ProxyHandler, build_opener
+
+    return build_opener(ProxyHandler({}))
 
 
 class RainfallAppState:
@@ -246,9 +293,9 @@ class RainfallAppState:
                 "lookback_days": LIVE_LOOKBACK_DAYS,
                 "rule": (
                     "The model predicts the next 14 days after today. Day 1 uses "
-                    "the latest observed web history; later days reuse earlier ML "
-                    "predictions as rainfall-memory inputs because their prior days "
-                    "are not observed yet."
+                    "the latest observed web history; later days use provider "
+                    "forecast or NASA baseline values as future rainfall-memory "
+                    "inputs because their prior days are not observed yet."
                 ),
             },
             "rainfall_categories": RAINFALL_CATEGORIES,
@@ -305,12 +352,19 @@ class RainfallAppState:
         nasa_baseline = self.build_nasa_reference_series(entity_id)
         try:
             web_forecast = self.fetch_web_forecast(self.city_lookup[entity_id])
+            web_forecast_source = "Open-Meteo Forecast API"
         except Exception as exc:
-            web_forecast = {}
-            provider_notes.append(f"Open-Meteo web forecast unavailable: {exc}")
+            web_forecast = self.forecast_fallback_from_nasa_baseline(nasa_baseline)
+            web_forecast_source = (
+                "NASA seasonal baseline fallback because Open-Meteo forecast is unavailable"
+            )
+            provider_notes.append(
+                "Open-Meteo web forecast unavailable; NASA seasonal baseline was "
+                "used as the weather-assisted provider feature."
+            )
         running_rainfall_by_date = dict(history_payload["rainfall_by_date"])
         source_counts = dict(history_payload["source_counts"])
-        recursive_input_days = 0
+        future_memory_input_days = 0
         rows = []
         for target_date in pd.date_range(self.series_start_date, self.series_end_date, freq="D"):
             target_day = target_date.date()
@@ -343,12 +397,37 @@ class RainfallAppState:
                 web_forecast_day=web_forecast.get(target_day.strftime("%Y-%m-%d"), {}),
                 nasa_baseline_day=nasa_baseline.get(target_day.strftime("%Y-%m-%d"), {}),
             )
-            prediction_mm = self.predict_from_feature_row(model_name, feature_row)
+            prediction_payload = self.predict_from_feature_row(model_name, feature_row)
+            prediction_mm = prediction_payload["prediction_mm"]
             recursive_step = (target_day - self.series_start_date).days
+            web_memory_mm = to_json_value(
+                web_forecast.get(target_day.strftime("%Y-%m-%d"), {}).get(
+                    "precipitation_sum_mm"
+                )
+            )
+            nasa_memory_mm = to_json_value(
+                nasa_baseline.get(target_day.strftime("%Y-%m-%d"), {}).get(
+                    "precipitation_sum_mm"
+                )
+            )
+            if web_memory_mm is not None:
+                future_memory_mm = float(web_memory_mm)
+                future_memory_source = "provider forecast"
+            elif nasa_memory_mm is not None:
+                future_memory_mm = float(nasa_memory_mm)
+                future_memory_source = "NASA seasonal baseline"
+            else:
+                future_memory_mm = prediction_mm
+                future_memory_source = "ML prediction fallback"
             rows.append(
                 {
                     "date": target_day.strftime("%Y-%m-%d"),
                     "prediction_mm": prediction_mm,
+                    "raw_log_prediction": prediction_payload["raw_log_prediction"],
+                    "prediction_was_capped": prediction_payload["prediction_was_capped"],
+                    "prediction_guard_reason": prediction_payload[
+                        "prediction_guard_reason"
+                    ],
                     "prediction_category": classify_rainfall(prediction_mm),
                     "web_forecast_mm": web_forecast.get(
                         target_day.strftime("%Y-%m-%d"), {}
@@ -365,17 +444,26 @@ class RainfallAppState:
                     "feature_memory_source": (
                         "observed web history"
                         if recursive_step == 0
-                        else "observed web history + previous ML predictions"
+                        else f"observed web history + previous {future_memory_source}"
                     ),
+                    "future_memory_mm": future_memory_mm,
+                    "future_memory_source": future_memory_source,
                 }
             )
-            running_rainfall_by_date[pd.Timestamp(target_day).normalize()] = prediction_mm
-            recursive_input_days += 1
+            running_rainfall_by_date[pd.Timestamp(target_day).normalize()] = future_memory_mm
+            future_memory_input_days += 1
 
         available = [row for row in rows if row["available"]]
-        if recursive_input_days:
-            source_counts["previous ML predictions reused as future lag inputs"] = (
-                recursive_input_days
+        if future_memory_input_days:
+            source_counts["provider/baseline values reused as future lag inputs"] = (
+                future_memory_input_days
+            )
+        capped_days = sum(1 for row in available if row.get("prediction_was_capped"))
+        if capped_days:
+            source_counts["ML hard prediction cap applied"] = capped_days
+            provider_notes.append(
+                f"{capped_days} ML day(s) exceeded the display/deployment cap of "
+                f"{PREDICTION_CAP_MM:.0f} mm/day."
             )
         result = {
             "city": self.city_lookup[entity_id],
@@ -387,10 +475,10 @@ class RainfallAppState:
                 "training_end": self.history_max_date.strftime("%Y-%m-%d"),
                 "horizon_days": FUTURE_FORECAST_DAYS,
                 "lookback_days": LIVE_LOOKBACK_DAYS,
-                "strategy": "recursive_ml_forecast_after_day_1",
+                "strategy": "weather_assisted_forecast_memory_after_day_1",
             },
             "input_sources": source_counts,
-            "web_forecast_source": "Open-Meteo Forecast API",
+            "web_forecast_source": web_forecast_source,
             "nasa_baseline_source": "NASA POWER 2020-2025 day-of-year climatology baseline",
             "provider_notes": provider_notes,
             "rows": rows,
@@ -419,6 +507,22 @@ class RainfallAppState:
                 "precipitation_probability_max_pct": None,
             }
         return reference
+
+    def forecast_fallback_from_nasa_baseline(
+        self, nasa_baseline: dict[str, dict]
+    ) -> dict[str, dict]:
+        fallback = {}
+        for date_key, row in nasa_baseline.items():
+            rainfall = to_json_value(row.get("precipitation_sum_mm"))
+            fallback[date_key] = {
+                "precipitation_sum_mm": rainfall,
+                "precipitation_probability_max_pct": (
+                    100.0
+                    if rainfall is not None and float(rainfall) >= WET_DAY_THRESHOLD_MM
+                    else 0.0
+                ),
+            }
+        return fallback
 
     def nasa_dayofyear_climatology(self, entity_id: str) -> dict[int, float]:
         entity_history = self.local_target_history.get(entity_id, {})
@@ -462,6 +566,9 @@ class RainfallAppState:
             "mean_daily_change_mm": float(np.mean(np.abs(diffs))) if len(diffs) else 0.0,
             "max_daily_jump_mm": float(np.max(np.abs(diffs))) if len(diffs) else 0.0,
             "trend_slope_mm_per_day": trend_slope,
+            "capped_prediction_days": int(
+                sum(1 for row in available_rows if row.get("prediction_was_capped"))
+            ),
         }
 
     def comparison_summary(self, available_rows: list[dict], comparison_field: str) -> dict:
@@ -509,7 +616,10 @@ class RainfallAppState:
         try:
             nasa_values = self.fetch_nasa_power_history(city, start_date, end_date)
         except Exception as exc:
-            notes.append(f"NASA POWER unavailable: {exc}")
+            notes.append(
+                "NASA POWER live history unavailable; local packaged/climatology "
+                "fallback was used for recent rainfall memory."
+            )
 
         local_values = self.local_target_history.get(entity_id, {})
         climatology = self.nasa_dayofyear_climatology(entity_id)
@@ -593,18 +703,83 @@ class RainfallAppState:
         if entity_id not in self.city_lookup:
             raise KeyError(f"Unknown city entity_id: {entity_id}")
         city = self.city_lookup[entity_id]
-        payload = fetch_json(
-            NASA_POWER_DAILY_URL,
-            {
-                "parameters": "PRECTOTCORR,T2M,RH2M,WS10M",
-                "community": "AG",
-                "longitude": round(city["longitude"], 4),
-                "latitude": round(city["latitude"], 4),
-                "start": yyyymmdd(self.today - timedelta(days=10)),
-                "end": yyyymmdd(self.today),
-                "format": "JSON",
-            },
-        )
+        try:
+            payload = fetch_json(
+                OPEN_METEO_FORECAST_URL,
+                {
+                    "latitude": city["latitude"],
+                    "longitude": city["longitude"],
+                    "current": (
+                        "temperature_2m,relative_humidity_2m,precipitation,"
+                        "rain,weather_code,wind_speed_10m"
+                    ),
+                    "daily": "precipitation_sum,precipitation_probability_max",
+                    "timezone": "auto",
+                    "forecast_days": 1,
+                },
+            )
+            current = payload.get("current", {})
+            daily = payload.get("daily", {})
+            weather_code = to_json_value(current.get("weather_code"))
+            today_rain_values = daily.get("precipitation_sum", [])
+            today_probability_values = daily.get("precipitation_probability_max", [])
+            return {
+                "city": city,
+                "source": "Open-Meteo Current API",
+                "updated_at": current.get("time") or self.today.strftime("%Y-%m-%d"),
+                "timezone": payload.get("timezone") or "auto",
+                "temperature_2m_c": to_json_value(current.get("temperature_2m")),
+                "relative_humidity_2m_pct": to_json_value(
+                    current.get("relative_humidity_2m")
+                ),
+                "precipitation_mm": to_json_value(current.get("precipitation")),
+                "rain_mm": to_json_value(current.get("rain")),
+                "wind_speed_10m_kmh": to_json_value(current.get("wind_speed_10m")),
+                "weather_code": weather_code,
+                "weather_label": weather_code_label(weather_code),
+                "today_provider_precipitation_sum_mm": (
+                    to_json_value(today_rain_values[0]) if today_rain_values else None
+                ),
+                "today_provider_precipitation_probability_pct": (
+                    to_json_value(today_probability_values[0])
+                    if today_probability_values
+                    else None
+                ),
+            }
+        except Exception:
+            pass
+
+        try:
+            payload = fetch_json(
+                NASA_POWER_DAILY_URL,
+                {
+                    "parameters": "PRECTOTCORR,T2M,RH2M,WS10M",
+                    "community": "AG",
+                    "longitude": round(city["longitude"], 4),
+                    "latitude": round(city["latitude"], 4),
+                    "start": yyyymmdd(self.today - timedelta(days=10)),
+                    "end": yyyymmdd(self.today),
+                    "format": "JSON",
+                },
+            )
+        except Exception as exc:
+            fallback_rain = self.nasa_dayofyear_climatology(entity_id).get(self.today.timetuple().tm_yday)
+            return {
+                "city": city,
+                "source": "Live weather unavailable",
+                "updated_at": self.today.strftime("%Y-%m-%d"),
+                "timezone": "local fallback",
+                "temperature_2m_c": None,
+                "relative_humidity_2m_pct": None,
+                "precipitation_mm": None,
+                "rain_mm": None,
+                "wind_speed_10m_kmh": None,
+                "weather_code": None,
+                "weather_label": "Live provider unavailable",
+                "today_provider_precipitation_sum_mm": fallback_rain,
+                "today_provider_precipitation_probability_pct": None,
+                "note": "Live current weather failed; historical rainfall baseline is hidden from Rain now.",
+            }
         parameters = payload.get("properties", {}).get("parameter", {})
         rainfall = parameters.get("PRECTOTCORR", {})
         latest_raw_date = None
@@ -614,7 +789,25 @@ class RainfallAppState:
                 latest_raw_date = raw_date
                 break
         if latest_raw_date is None:
-            raise ValueError("NASA POWER did not return recent daily weather values.")
+            fallback_rain = self.nasa_dayofyear_climatology(entity_id).get(
+                self.today.timetuple().tm_yday
+            )
+            return {
+                "city": city,
+                "source": "Live weather unavailable",
+                "updated_at": self.today.strftime("%Y-%m-%d"),
+                "timezone": "local fallback",
+                "temperature_2m_c": None,
+                "relative_humidity_2m_pct": None,
+                "precipitation_mm": None,
+                "rain_mm": None,
+                "wind_speed_10m_kmh": None,
+                "weather_code": None,
+                "weather_label": "Live provider unavailable",
+                "today_provider_precipitation_sum_mm": fallback_rain,
+                "today_provider_precipitation_probability_pct": None,
+                "note": "Live current weather failed; historical rainfall baseline is hidden from Rain now.",
+            }
 
         def parameter_value(parameter: str):
             value = parameters.get(parameter, {}).get(latest_raw_date)
@@ -749,20 +942,40 @@ class RainfallAppState:
             cursor -= timedelta(days=1)
         return count
 
-    def predict_from_feature_row(self, model_name: str, feature_row: pd.Series) -> float:
+    def predict_from_feature_row(self, model_name: str, feature_row: pd.Series) -> dict:
         model_input = feature_row.reindex(self.feature_columns).to_frame().T
         log_prediction = np.asarray(self.models[model_name].predict(model_input), dtype=float)
-        max_log = np.log1p(PREDICTION_CAP_MM)
-        log_prediction = np.nan_to_num(log_prediction, nan=0.0, posinf=max_log, neginf=0.0)
-        prediction = np.expm1(np.clip(log_prediction[0], 0.0, max_log))
-        return float(np.clip(prediction, 0.0, PREDICTION_CAP_MM))
+        raw_log_value = float(log_prediction[0]) if len(log_prediction) else 0.0
+        max_log = float(np.log1p(PREDICTION_CAP_MM))
+        invalid_output = not math.isfinite(raw_log_value)
+        finite_log_value = float(
+            np.nan_to_num(raw_log_value, nan=0.0, posinf=max_log, neginf=0.0)
+        )
+        clipped_log_value = float(np.clip(finite_log_value, 0.0, max_log))
+        prediction = float(np.expm1(clipped_log_value))
+        was_capped = invalid_output or finite_log_value < 0.0 or finite_log_value > max_log
+
+        reason = None
+        if invalid_output:
+            reason = "model_output_not_finite"
+        elif finite_log_value < 0.0:
+            reason = "negative_log_prediction_clipped_to_zero"
+        elif finite_log_value > max_log:
+            reason = "above_500mm_hard_cap"
+
+        return {
+            "prediction_mm": prediction,
+            "raw_log_prediction": raw_log_value if math.isfinite(raw_log_value) else None,
+            "prediction_was_capped": bool(was_capped),
+            "prediction_guard_reason": reason,
+        }
 
 
 APP_STATE = RainfallAppState()
 
 
 class RainfallRequestHandler(SimpleHTTPRequestHandler):
-    server_version = "RainfallModelServer/5.4"
+    server_version = "RainfallModelServer/5.9"
 
     def log_message(self, format: str, *args) -> None:
         print(f"{self.address_string()} - {format % args}")
