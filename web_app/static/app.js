@@ -439,6 +439,7 @@ function renderFeatureSummary() {
       <span>${summary.location_feature_count} location features</span>
       <span>${summary.calendar_feature_count} seasonal features</span>
       <span>${summary.rainfall_memory_feature_count} rainfall-memory features</span>
+      <span>${summary.weather_forecast_feature_count || 0} weather-assisted features</span>
       <span>${summary.lookback_days}-day live observed lookback</span>
     </div>
   `;

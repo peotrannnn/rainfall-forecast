@@ -133,9 +133,10 @@ class RainfallAppState:
         if TARGET_COLUMN not in self.y.columns:
             raise KeyError(f"Missing selected target column: {TARGET_COLUMN}")
 
-        self.feature_columns = ["entity_id"] + [
+        self.base_feature_columns = ["entity_id"] + [
             column for column in self.x.columns if column.startswith("feature_")
         ]
+        self.feature_columns = self._load_model_feature_columns(self.base_feature_columns)
 
         self.history_min_date = self.x["date"].min().date()
         self.history_max_date = self.x["date"].max().date()
@@ -170,6 +171,25 @@ class RainfallAppState:
 
         self.history_cache: dict[str, dict] = {}
         self.series_cache: dict[tuple[str, str], dict] = {}
+
+    def _load_model_feature_columns(self, default_columns: list[str]) -> list[str]:
+        metadata_paths = [
+            MODEL_DIR / "best_model_metadata.json",
+            MODEL_DIR / "hist_gradient_boosting_log_metadata.json",
+            MODEL_DIR / "gradient_boosting_log_metadata.json",
+            MODEL_DIR / "mlp_log_metadata.json",
+        ]
+        for path in metadata_paths:
+            if not path.exists():
+                continue
+            try:
+                metadata = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            feature_columns = metadata.get("feature_columns")
+            if isinstance(feature_columns, list) and feature_columns:
+                return [str(column) for column in feature_columns]
+        return default_columns
 
     def _build_city_lookup(self) -> dict[str, dict]:
         rows = (
@@ -250,17 +270,23 @@ class RainfallAppState:
             for col in self.feature_columns
             if any(token in col for token in ["lag", "rolling", "spell", "wet"])
         ]
+        weather_forecast_features = [
+            col
+            for col in self.feature_columns
+            if any(token in col for token in ["provider_forecast", "nasa_seasonal"])
+        ]
         return {
             "feature_count": len(self.feature_columns),
             "location_feature_count": len(location_features),
             "calendar_feature_count": len(calendar_features),
             "rainfall_memory_feature_count": len(rainfall_memory_features),
+            "weather_forecast_feature_count": len(weather_forecast_features),
             "lookback_days": LIVE_LOOKBACK_DAYS,
             "plain_language": (
                 "The model uses city identity, coordinates, seasonal sine/cosine "
                 "features, rainfall lags, rolling rainfall windows, wet/dry spell "
-                "features, and imputation flags. The future series uses a recursive "
-                "ML strategy after the first predicted day."
+                "features, imputation flags, and optional weather-assisted provider "
+                "forecast features when the loaded model was trained with them."
             ),
         }
 
@@ -314,6 +340,8 @@ class RainfallAppState:
                 entity_id,
                 target_day,
                 {"rainfall_by_date": running_rainfall_by_date},
+                web_forecast_day=web_forecast.get(target_day.strftime("%Y-%m-%d"), {}),
+                nasa_baseline_day=nasa_baseline.get(target_day.strftime("%Y-%m-%d"), {}),
             )
             prediction_mm = self.predict_from_feature_row(model_name, feature_row)
             recursive_step = (target_day - self.series_start_date).days
@@ -611,7 +639,14 @@ class RainfallAppState:
             "today_provider_precipitation_probability_pct": None,
         }
 
-    def build_feature_row(self, entity_id: str, target_date, history_payload: dict) -> pd.Series:
+    def build_feature_row(
+        self,
+        entity_id: str,
+        target_date,
+        history_payload: dict,
+        web_forecast_day: dict | None = None,
+        nasa_baseline_day: dict | None = None,
+    ) -> pd.Series:
         row = self.latest_feature_by_entity.loc[entity_id].copy()
         row["date"] = pd.Timestamp(target_date)
         row["date_key"] = target_date.strftime("%Y-%m-%d")
@@ -619,7 +654,36 @@ class RainfallAppState:
         row["sample_id"] = f"{entity_id}__{target_date:%Y%m%d}"
         self.patch_calendar_features(row, target_date)
         self.patch_temporal_features(row, target_date, history_payload["rainfall_by_date"])
+        self.patch_weather_assisted_features(row, web_forecast_day or {}, nasa_baseline_day or {})
         return row
+
+    def patch_weather_assisted_features(
+        self, row: pd.Series, web_forecast_day: dict, nasa_baseline_day: dict
+    ) -> None:
+        web_mm = to_json_value(web_forecast_day.get("precipitation_sum_mm"))
+        web_probability = to_json_value(
+            web_forecast_day.get("precipitation_probability_max_pct")
+        )
+        nasa_baseline_mm = to_json_value(nasa_baseline_day.get("precipitation_sum_mm"))
+        web_mm = 0.0 if web_mm is None else float(web_mm)
+        web_probability = (
+            100.0 if web_mm >= WET_DAY_THRESHOLD_MM else 0.0
+            if web_probability is None
+            else float(web_probability)
+        )
+        nasa_baseline_mm = 0.0 if nasa_baseline_mm is None else float(nasa_baseline_mm)
+        updates = {
+            "feature_provider_forecast_precipitation_mm": web_mm,
+            "feature_provider_forecast_log1p_precipitation": math.log1p(max(web_mm, 0.0)),
+            "feature_provider_forecast_probability_pct": web_probability,
+            "feature_provider_forecast_is_wet": 1.0
+            if web_mm >= WET_DAY_THRESHOLD_MM
+            else 0.0,
+            "feature_nasa_seasonal_baseline_mm": nasa_baseline_mm,
+            "feature_provider_minus_nasa_baseline_mm": web_mm - nasa_baseline_mm,
+        }
+        for column, value in updates.items():
+            row[column] = value
 
     def patch_calendar_features(self, row: pd.Series, target_date) -> None:
         day_of_year = target_date.timetuple().tm_yday
@@ -686,7 +750,7 @@ class RainfallAppState:
         return count
 
     def predict_from_feature_row(self, model_name: str, feature_row: pd.Series) -> float:
-        model_input = feature_row[self.feature_columns].to_frame().T
+        model_input = feature_row.reindex(self.feature_columns).to_frame().T
         log_prediction = np.asarray(self.models[model_name].predict(model_input), dtype=float)
         max_log = np.log1p(PREDICTION_CAP_MM)
         log_prediction = np.nan_to_num(log_prediction, nan=0.0, posinf=max_log, neginf=0.0)
@@ -698,7 +762,7 @@ APP_STATE = RainfallAppState()
 
 
 class RainfallRequestHandler(SimpleHTTPRequestHandler):
-    server_version = "RainfallModelServer/5.3"
+    server_version = "RainfallModelServer/5.4"
 
     def log_message(self, format: str, *args) -> None:
         print(f"{self.address_string()} - {format % args}")

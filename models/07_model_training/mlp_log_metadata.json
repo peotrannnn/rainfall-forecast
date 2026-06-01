@@ -1,13 +1,12 @@
 {
   "model_name": "mlp_log",
-  "selected_as_best": false,
   "selected_target": "target_nasa_power_precipitation_mm",
   "target_transform": "log1p during training; expm1 during prediction",
   "prediction_clip_mm_day": [
     0.0,
     500.0
   ],
-  "training_strategy": "Tuned higher-capacity models with moderate rainfall-intensity sample weights (scale=0.35) to reduce underfitting.",
+  "training_strategy": "weather-assisted model-ready training using Open-Meteo target as future web-forecast proxy",
   "feature_columns": [
     "entity_id",
     "feature_canonical_latitude",
@@ -33,11 +32,23 @@
     "feature_rainfall_rolling_90d_mean_prev_mm_was_imputed",
     "feature_wet_spell_days_prev_was_imputed",
     "feature_dry_spell_days_prev_was_imputed",
-    "feature_was_wet_previous_day_was_imputed"
+    "feature_was_wet_previous_day_was_imputed",
+    "feature_provider_forecast_precipitation_mm",
+    "feature_provider_forecast_log1p_precipitation",
+    "feature_provider_forecast_probability_pct",
+    "feature_provider_forecast_is_wet",
+    "feature_nasa_seasonal_baseline_mm",
+    "feature_provider_minus_nasa_baseline_mm"
   ],
-  "validation_mae_mm_day": 4.539998405729846,
-  "validation_std_capture_ratio": 0.5223231003690996,
-  "test_mae_mm_day": 5.22384672236157,
-  "test_std_capture_ratio": 0.5103133755751531,
-  "saved_at_utc": "2026-06-01T05:43:27.721610+00:00"
+  "weather_assisted_features": [
+    "feature_provider_forecast_precipitation_mm",
+    "feature_provider_forecast_log1p_precipitation",
+    "feature_provider_forecast_probability_pct",
+    "feature_provider_forecast_is_wet",
+    "feature_nasa_seasonal_baseline_mm",
+    "feature_provider_minus_nasa_baseline_mm"
+  ],
+  "validation_mae_mm_day": 4.650316977210923,
+  "validation_std_capture_ratio": 0.6070186934030143,
+  "saved_at_utc": "2026-06-01T05:56:14.816515+00:00"
 }
