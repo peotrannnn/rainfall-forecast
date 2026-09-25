@@ -205,8 +205,9 @@ Notebook 03 giữ năm cách biểu diễn lượng mưa mục tiêu:
 
 Với mỗi thành phố và tháng, độ lệch được ước lượng **chỉ trên tập train**:
 
-```math
-b_{c,m}=\operatorname{mean}_{\mathrm{train},c,m}(P_{\mathrm{NASA}}-P_{\mathrm{OpenMeteo}})
+```text
+bias(city, month) = mean(P_NASA − P_OpenMeteo)
+                   trên các ngày thuộc tập train của thành phố và tháng đó
 ```
 
 Open-Meteo hiệu chỉnh về NASA được tính bằng `max(P_OpenMeteo + b, 0)`; chiều ngược lại dùng `max(P_NASA − b, 0)`. Nếu thiếu thống kê nhóm, dùng bias train của thành phố, sau đó mới đến bias train toàn bộ dữ liệu.
